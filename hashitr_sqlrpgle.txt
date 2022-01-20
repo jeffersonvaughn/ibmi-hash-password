@@ -10,7 +10,7 @@ exec sql
   datfmt    = *iso;
 
 dcl-pi hashitr;
-  p_pass          char(20)              const;
+  p_pass          char(32)              const;
   o_hash          char(128);
 end-pi;
 
