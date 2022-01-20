@@ -11,7 +11,7 @@ exec sql
 
 dcl-pi hashitr;
   p_pass          char(32)              const;
-  o_hash          char(128);
+  o_hash          char(64);
 end-pi;
 
 dcl-s g_command          char(1000);
