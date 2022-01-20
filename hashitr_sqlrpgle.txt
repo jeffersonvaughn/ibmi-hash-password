@@ -1,13 +1,13 @@
-**FREE
+**free
 ctl-opt option (*srcstmt : *nodebugio : *nounref);
 ctl-opt debug (*input);
 ctl-opt dftactgrp (*no);
 
-          exec sql
-            set option
-            commit = *none,
-            closqlcsr = *endmod,
-            datfmt    = *iso;
+exec sql
+  set option
+  commit = *none,
+  closqlcsr = *endmod,
+  datfmt    = *iso;
 
 dcl-pi hashitr;
   p_pass          char(20)              const;
@@ -18,14 +18,11 @@ dcl-s g_command          char(1000);
 dcl-s g_pathToPython     char(10);
 dcl-s g_pythonScript     char(25);
 
-// - - - -
-// Run CL Command
-
-dcl-pr Run     ExtPgm('QCMDEXC');
+dcl-pr run     ExtPgm('QCMDEXC');
        CmdStr  Char(3000) Options(*VarSize);
        CmdLen  Packed(15:5) Const;
        CmdDbcs Char(2) Const Options(*Nopass);
-End-pr;
+end-pr;
 
 //--------------------------------------------------------
 
@@ -33,8 +30,8 @@ setUp();
 executePythonScript();
 getHashValue();
 
-*Inlr = *On;
-Return;
+*inlr = *on;
+return;
 
 //--------------------------------------------------------
 // setUp subprocedure
@@ -42,17 +39,16 @@ Return;
 
 dcl-proc setUp;
 
-  g_pathToPython = 'python3';
-  g_pythonScript = '/home/jvaughn/hashit.py';
+g_pathToPython = 'python3';
+g_pythonScript = '/home/jvaughn/hashit.py';
 
-  g_command = 'OVRDBF FILE(STDOUT) TOFILE(QTEMP/QSTDOUT) ' +
-                     'OVRSCOPE(*JOB) '                     +
-                     'OPNSCOPE(*JOB)';
-  exec sql call qsys2.qcmdexc(:g_command);
+g_command = 'OVRDBF FILE(STDOUT) TOFILE(QTEMP/QSTDOUT) ' +
+                   'OVRSCOPE(*JOB) '                     +
+                   'OPNSCOPE(*JOB)';
+exec sql call qsys2.qcmdexc(:g_command);
 
-  g_command ='CLRPFM QTEMP/QSTDOUT';
-  exec sql call qsys2.qcmdexc(:g_command);
-
+g_command ='CLRPFM QTEMP/QSTDOUT';
+exec sql call qsys2.qcmdexc(:g_command);
 
 end-proc setUp;
 
@@ -62,22 +58,15 @@ end-proc setUp;
 
 dcl-proc executePythonScript;
 
-   // Use Qshell to execute the Python script.
-   //
-   // Note: Parameters are detected by a space in Python, so the
-   // the 'fourthParameter' needs to be in quotes since it has two
-   // words separated by a space.  if I didn't put it in quotes,
-   // Python would see them as two separate parameters.
+g_command = 'Qsh Cmd('                                     +
+                     ''''                                  +
+                         %trim(g_pathToPython) + ' '       +
+                         %trim(g_pythonScript) + ' '       +
+                         %trim(p_pass)                     +
+                     ''''                                  +
+                       ')';
 
-   g_command = 'Qsh Cmd('                                     +
-                        ''''                                  +
-                            %trim(g_pathToPython) + ' '       +
-                            %trim(g_pythonScript) + ' '       +
-                            %trim(p_pass)                     +
-                        ''''                                  +
-                          ')';
-
-   Callp Run(g_command:%Size(g_command));
+callp run(g_command:%Size(g_command));
 
 end-proc executePythonScript;
 
@@ -93,7 +82,7 @@ exec sql
   from qtemp.qstdout
   fetch first 1 row only;
 
-  g_command ='DLTOVR FILE(STDOUT) LVL(*JOB)';
-  exec sql call qsys2.qcmdexc(:g_command);
+g_command ='DLTOVR FILE(STDOUT) LVL(*JOB)';
+exec sql call qsys2.qcmdexc(:g_command);
 
 end-proc;
